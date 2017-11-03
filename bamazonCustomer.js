@@ -73,7 +73,7 @@ function pickQuantity(ans) {
 }
 
      
-function purchaseItem(itemNum, numPurchased, callback) {
+function purchaseItem(itemId, numPurchased, callback) {
   connection.query(
     "SELECT * FROM products WHERE ?",
     [{ item_id: itemNum }],
@@ -86,14 +86,14 @@ function purchaseItem(itemNum, numPurchased, callback) {
         console.log("Insufficient quantity!");
       } else {
         newStockAmt = res[0].stock_quantity - numPurchased;
-        updateInventory(itemNum, newStockAmt);
-        callback(itemNum, numPurchased);
+        updateInventory(itemId, newStockAmt);
+        callback(itemId, numPurchased);
       }
     }
   );
 }
 
-function updateInventory(thatItem, newValue) {
+function updateInventory(selectedItem, newValue) {
   var query = connection.query(
     "UPDATE products SET ? WHERE ?",
     [
@@ -112,12 +112,12 @@ function updateInventory(thatItem, newValue) {
   );
 }
 
-function setProfit(itemNum, numPurchased) {
+function setProfit(itemId, numPurchased) {
   var query = connection.query(
     "UPDATE products SET product_sales = " + numPurchased + "* price WHERE ?",
     [
       {
-        item_id: itemNum
+        item_id: itemId
       }
     ],
     function(err, res) {
