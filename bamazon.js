@@ -109,8 +109,8 @@ function pickQuantity(ans) {
       }
 
       reprompt();
-    })
-})
+    }
+}
 }
 
 function reprompt(){
@@ -127,4 +127,4 @@ function reprompt(){
   });
 }
 
-// start();
+start();
