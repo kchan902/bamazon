@@ -1,0 +1,29 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "An Amazon like storefront where you can purchase items ",
+  "main": "bamazon.js",
+  "dependencies": {
+    "console.table": "^0.9.1",
+    "inquirer": "^3.3.0",
+    "mysql": "^2.15.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kchan902/bamazon.git"
+  },
+  "keywords": [
+    "amazon",
+    "bamazon"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kchan902/bamazon/issues"
+  },
+  "homepage": "https://github.com/kchan902/bamazon#readme"
+}
