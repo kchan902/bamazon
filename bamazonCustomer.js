@@ -72,59 +72,60 @@ function pickQuantity(ans) {
 
 }
 
-      var whatToBuy = (ans.id)-1;
-      var howMuchToBuy = parseInt(ans.qty);
-      var grandTotal = parseFloat(((res[whatToBuy].Price)*howMuchToBuy).toFixed(2));
+     
+function purchaseItem(itemNum, numPurchased, callback) {
+  connection.query(
+    "SELECT * FROM products WHERE ?",
+    [{ item_id: itemNum }],
+    function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      //console.log("hello");
 
-      if(res[whatToBuy].StockQuantity >= howMuchToBuy){
-
-        connection.query("UPDATE Products SET ? WHERE ?", [
-        {StockQuantity: (res[whatToBuy].StockQuantity - howMuchToBuy)},
-        {ItemID: ans.id}
-        ], function(err, result){
-            if(err) throw err;
-            console.log("Success! Your total is $" + grandTotal.toFixed(2) + ". Your item(s) will be shipped to you in 3-5 business days.");
-        });
-
-        connection.query("SELECT * FROM Departments", function(err, deptRes){
-          if(err) throw err;
-          var index;
-          for(var i = 0; i < deptRes.length; i++){
-            if(deptRes[i].DepartmentName === res[whatToBuy].DepartmentName){
-              index = i;
-            }
-          }
-          
-          connection.query("UPDATE Departments SET ? WHERE ?", [
-          {TotalSales: deptRes[index].TotalSales + grandTotal},
-          {DepartmentName: res[whatToBuy].DepartmentName}
-          ], function(err, deptRes){
-              if(err) throw err;
-          
-          });
-        });
-
-      } else{
-        console.log("Sorry, there's not enough in stock!");
+      if (numPurchased > res[0].stock_quantity) {
+        console.log("Insufficient quantity!");
+      } else {
+        newStockAmt = res[0].stock_quantity - numPurchased;
+        updateInventory(itemNum, newStockAmt);
+        callback(itemNum, numPurchased);
       }
-
-      reprompt();
     }
-}
+  );
 }
 
-function reprompt(){
-  inquirer.prompt([{
-    type: "confirm",
-    name: "reply",
-    message: "Would you like to purchase another item?"
-  }]).then(function(ans){
-    if(ans.reply){
-      start();
-    } else{
-      console.log("See you soon!");
+function updateInventory(thatItem, newValue) {
+  var query = connection.query(
+    "UPDATE products SET ? WHERE ?",
+    [
+      {
+        stock_quantity: newValue
+      },
+      {
+        item_id: thatItem
+      }
+    ],
+    function(err, res) {
+      if (err) {
+        throw err;
+      }
     }
-  });
+  );
+}
+
+function setProfit(itemNum, numPurchased) {
+  var query = connection.query(
+    "UPDATE products SET product_sales = " + numPurchased + "* price WHERE ?",
+    [
+      {
+        item_id: itemNum
+      }
+    ],
+    function(err, res) {
+      if (err) {
+        throw err;
+      }
+    }
+  );
 }
 
 start();
