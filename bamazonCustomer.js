@@ -2,6 +2,7 @@ var mysql = require('mysql');
 var inquirer = require('inquirer');
 require('console.table');
 
+
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -35,8 +36,7 @@ function pickId(inventory) {
       name: "id",
       message: "What is the ID of the product you would like to purchase?",
       validate: function(value){
-        return !isNaN(value)
-        if(isNaN(value) == false && parseInt(value) <= res.length && parseInt(value) > 0){
+        if(isNaN(value) == false && parseInt(value) <= inventory.length && parseInt(value) > 0){
           return true;
         } else{
           return false;
@@ -44,7 +44,6 @@ function pickId(inventory) {
       }
     }
     ]).then(function(value){
-      console.log(inventory.product_id)
       pickQuantity(value)
     })
 }
@@ -67,7 +66,7 @@ function pickQuantity(ans) {
     }
 
     ]).then(function(value){
-      console.log(ans, value)
+      purchaseItem(ans.id, value.qty, start);
     })
 
 }
@@ -76,7 +75,7 @@ function pickQuantity(ans) {
 function purchaseItem(itemId, numPurchased, callback) {
   connection.query(
     "SELECT * FROM products WHERE ?",
-    [{ item_id: itemNum }],
+    [{ item_id: itemId }],
     function(err, res) {
       if (err) throw err;
       // Log all results of the SELECT statement
@@ -84,6 +83,7 @@ function purchaseItem(itemId, numPurchased, callback) {
 
       if (numPurchased > res[0].stock_quantity) {
         console.log("Insufficient quantity!");
+        callback();
       } else {
         newStockAmt = res[0].stock_quantity - numPurchased;
         updateInventory(itemId, newStockAmt);
@@ -101,7 +101,7 @@ function updateInventory(selectedItem, newValue) {
         stock_quantity: newValue
       },
       {
-        item_id: thatItem
+        item_id: selectedItem
       }
     ],
     function(err, res) {
@@ -128,4 +128,3 @@ function setProfit(itemId, numPurchased) {
   );
 }
 
-start();
